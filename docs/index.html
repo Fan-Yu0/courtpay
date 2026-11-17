@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>CourtPay — x402 payments that can be appealed</title>
+<meta name="description" content="CourtPay adds an adjudicated refund path to x402 purchases: a GenLayer jury reads the delivered artifact and decides whether the seller kept the promise." />
+<style>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: radial-gradient(1200px 600px at 20% 0%, #17203a 0%, #070b10 55%); color: #e8eef7;
+    font: 16px/1.6 -apple-system, "Segoe UI", Roboto, sans-serif; }
+  main { max-width: 920px; margin: 0 auto; padding: 72px 24px 96px; }
+  .brands { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 32px; }
+  .chip { display: inline-flex; align-items: center; gap: 10px; padding: 8px 14px; border-radius: 12px;
+    border: 1px solid #2a3a54; background: #0e1622; font-size: 14px; letter-spacing: .2px; }
+  .dot { width: 10px; height: 10px; border-radius: 3px; }
+  h1 { font-size: clamp(40px, 7vw, 68px); line-height: 1.05; margin: 0 0 16px; letter-spacing: -.02em; }
+  .lede { font-size: 20px; color: #93a6c2; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 16px; margin: 40px 0; }
+  .card { border: 1px solid #223150; background: #0c131d; border-radius: 16px; padding: 20px; }
+  .card h3 { margin: 0 0 8px; font-size: 15px; color: #7f93b3; font-weight: 600; text-transform: uppercase; letter-spacing: .08em; }
+  .card p { margin: 0; }
+  code { font-family: Consolas, ui-monospace, monospace; background: #111a27; padding: 2px 6px; border-radius: 6px; font-size: 14px; }
+  pre { background: #0a1119; border: 1px solid #1e2c44; border-radius: 14px; padding: 18px; overflow: auto; }
+  a { color: #7fb0ff; }
+  .cta { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 36px; }
+  .btn { padding: 12px 18px; border-radius: 12px; background: #2f6bff; color: #fff; text-decoration: none; font-weight: 600; }
+  .btn.ghost { background: transparent; border: 1px solid #2f4a78; color: #cfe0ff; }
+  footer { margin-top: 56px; color: #6d7f9c; font-size: 14px; }
+</style>
+</head>
+<body>
+<main>
+  <div class="brands">
+    <span class="chip"><span class="dot" style="background:#e4483c"></span>Internet Court</span>
+    <span class="chip"><span class="dot" style="background:#8b5cf6"></span>GenLayer</span>
+    <span class="chip"><span class="dot" style="background:#4c8dff"></span>x402</span>
+  </div>
+
+  <h1>Payments that can be<br />appealed.</h1>
+  <p class="lede">x402 settles before the buyer reads the artifact. CourtPay turns the signed
+  receipt into a case: GenLayer validators fetch the delivery themselves and decide whether the
+  seller kept the promise — the verdict releases the refund.</p>
+
+  <div class="cta">
+    <a class="btn" href="https://github.com/Fan-Yu0/courtpay/releases/download/v0.1.0/courtpay-demo.mp4">Watch the 45s demo</a>
+    <a class="btn ghost" href="https://github.com/Fan-Yu0/courtpay">Source on GitHub</a>
+  </div>
+
+  <div class="grid">
+    <div class="card"><h3>Pay</h3><p>Seller answers <code>402 Payment Required</code>; the buyer signs a real EIP-3009 authorization and gets a seller-signed receipt.</p></div>
+    <div class="card"><h3>Dispute</h3><p>The receipt becomes a case on a GenLayer contract with the public delivery URL and the promise it was sold under.</p></div>
+    <div class="card"><h3>Judge</h3><p>Every validator fetches the artifact and re-runs the same review. Verdict bands must match exactly; refund is a pure function of the verdict.</p></div>
+  </div>
+
+  <h2>Live case</h2>
+  <pre>contract  0x533f3b4b9D6BE050fD64fa23e577Ab5918E46b10   (GenLayer Studio, chain 61999)
+case      case-1
+verdict   REFUND · high confidence · 250000 / 250000 units
+reason    "The delivery only contains 3 rows instead of the promised 10, and it is
+           missing the required p99 latency and probe checksum fields for each row."</pre>
+
+  <h2>Reproduce it</h2>
+  <pre>git clone https://github.com/Fan-Yu0/courtpay
+cd courtpay
+python -m venv .venv &amp;&amp; .venv\Scripts\activate
+pip install -r requirements.txt
+python -m courtpay demo --fresh</pre>
+
+  <footer>CourtPay is an open demonstration built for the GenLayer × Internet Court Builder mission. Settlement in the demo is a local ledger; the eip-3009 payload is real. MIT licensed.</footer>
+</main>
+</body>
+</html>
