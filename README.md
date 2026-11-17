@@ -34,6 +34,37 @@ records the authorized transfer in `ledger.json`. The authorization itself is a
 genuine EIP-3009 payload, so the same bytes can be handed to a hosted x402
 facilitator without changing the handshake (see [Settlement adapters](#settlement-adapters)).
 
+## Live case (GenLayer Studio Network)
+
+| Field | Value |
+| --- | --- |
+| Contract | `0x533f3b4b9D6BE050fD64fa23e577Ab5918E46b10` |
+| Case | `case-1` |
+| Verdict | `REFUND` (0) · confidence `high` |
+| Refund | `250000 / 250000` units |
+| Evidence judged | https://raw.githubusercontent.com/Fan-Yu0/courtpay/master/demo/deliveries/latency-feed.json |
+
+Jury reasoning, stored on-chain with the verdict:
+
+> The delivery only contains 3 rows instead of the promised 10, and it is
+> missing the required p99 latency and probe checksum fields for each row.
+
+Check it yourself:
+
+```bash
+python -c "from courtpay.court import Court; from courtpay.demo import wallets; \
+c = Court(wallets()['court'].key.hex(), contract='0x533f3b4b9D6BE050fD64fa23e577Ab5918E46b10'); \
+print(c.get_case('case-1'))"
+```
+
+The full record, including the receipt hash and the raw delivery, is in
+`evidence/live.json` and `demo/run-raw.txt`.
+
+## Demo video
+
+`demo/courtpay-demo.mp4` — 45s, generated from the real transcript by
+`demo/make_video.py`.
+
 ## Why GenLayer
 
 A delivery either matches the promise or it does not — and "matches" is a
@@ -86,7 +117,7 @@ courtpay/buyer.py             paid fetch + receipt verification
 courtpay/preflight.py         buyer-side deterministic check (before court)
 courtpay/court.py             GenLayer client: deploy, open, dispute, judge
 courtpay/demo.py              the end-to-end run
-tests/direct/                 9 direct-mode contract tests (mock web + LLM)
+tests/direct/                 10 direct-mode contract tests (mock web + LLM)
 tests/test_payments.py        7 x402 tests: underpay, replay, tamper, wrong payee
 demo/deliveries/              the artifact the jury is asked to judge
 ```
@@ -106,6 +137,24 @@ demo/deliveries/              the artifact the jury is asked to judge
 Verdict bands: `fulfilled → NO_REFUND`, `violated → REFUND`,
 `insufficient_evidence → UNDETERMINED` (escrow returns to the buyer, matching
 Internet Court's rule that an unprovable claim must not silently keep the money).
+
+## Internet Court mapping
+
+`courtpay/bridge.py` turns a resolved case into the Internet Court v1 jury
+payload, so the same dispute can be replayed into Internet Court's contract and
+surfaced on internetcourt.org:
+
+| CourtPay | Internet Court v1 |
+| --- | --- |
+| `promise` + `complaint` | `statement` |
+| review rubric | `guidelines` |
+| buyer + delivery URL | `party_a` evidence |
+| seller | `party_b` (no counter-evidence is a valid, losing default) |
+| `REFUND` / `NO_REFUND` / `UNDETERMINED` | `PARTY_A` / `PARTY_B` / `UNDETERMINED` |
+| `receipt_hash` | payment block on the Base escrow side |
+
+The verdict band is the only commitment; the reasoning is stored on both sides
+so an appeal reads the same evidence trail.
 
 ## Settlement adapters
 
@@ -133,8 +182,9 @@ settler.settle(authorization, requirements) -> payment_reference
 ## Tests
 
 ```bash
-pytest tests/direct -q      # 9 contract tests, mock web + LLM
-pytest tests/test_payments.py -q   # 7 x402 protocol tests
+pytest tests/direct -q            # 10 contract tests, mock web + LLM
+pytest tests/test_payments.py -q  # 7 x402 protocol tests
+pytest tests/test_bridge.py -q    # 4 Internet Court mapping tests
 genvm-lint check contracts/courtpay_court.py
 ```
 

@@ -6,3 +6,8 @@ __pycache__/
 artifacts/
 receipt.json
 *.egg-info/
+demo/frames/
+demo/*.png
+demo/run-raw.txt
+_dbg*.py
+_evidence.py

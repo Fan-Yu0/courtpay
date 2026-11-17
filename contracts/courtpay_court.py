@@ -75,6 +75,14 @@ class CourtPayCourt(gl.Contract):
             raise gl.vm.UserError(label + " is too long")
         return url
 
+    def _require_http(self, url: str, label: str) -> str:
+        url = url.strip()
+        if not (url.startswith("https://") or url.startswith("http://")):
+            raise gl.vm.UserError(label + " must be an http(s) URL")
+        if len(url) > MAX_URL:
+            raise gl.vm.UserError(label + " is too long")
+        return url
+
     def _require_hex(self, value: str, label: str, size: int) -> str:
         value = value.strip().lower()
         if value.startswith("0x"):
@@ -107,7 +115,7 @@ class CourtPayCourt(gl.Contract):
         buyer = gl.message.sender_address
         if seller.strip().lower() == buyer.as_hex.lower():
             raise gl.vm.UserError("buyer and seller must differ")
-        url = self._require_https(resource_url, "resource_url")
+        url = self._require_http(resource_url, "resource_url")
         spec = self._clean(promise, MAX_PROMISE, "promise")
         if len(spec) < 20:
             raise gl.vm.UserError("promise must describe the sold deliverable")

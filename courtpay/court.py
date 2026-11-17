@@ -58,6 +58,12 @@ class Court:
         status = receipt.get("status")
         if status not in (5, 6) and receipt.get("statusName") not in ("ACCEPTED", "FINALIZED"):
             raise RuntimeError("transaction failed: %s" % json.dumps(receipt, default=str)[:800])
+        for entry in (receipt.get("consensus_data") or {}).get("leader_receipt") or []:
+            if str(entry.get("execution_result", "")).upper() == "ERROR":
+                raise RuntimeError(
+                    "contract execution error in %s: %s"
+                    % (tx, json.dumps(entry.get("genvm_result", {}), default=str)[:600])
+                )
         return receipt
 
     def _write(self, function_name: str, args: list) -> str:

@@ -142,15 +142,25 @@ def test_promise_must_describe_the_deliverable(direct_vm, direct_deploy, direct_
     assert raised is True
 
 
-def test_non_https_evidence_is_rejected(direct_vm, direct_deploy, direct_alice, direct_bob):
+def test_plain_http_evidence_is_rejected(direct_vm, direct_deploy, direct_alice, direct_bob):
     contract = direct_deploy(CONTRACT)
+    case_id = _open(contract, direct_vm, direct_alice, direct_bob)
     direct_vm.sender = direct_alice
     try:
-        contract.open_case(to_hex(direct_bob), "http://seller.example.com/x", PROMISE, 1000, "USDC", RECEIPT)
+        contract.dispute(case_id, "http://cdn.example.com/delivery.json", "no checksum")
         raised = False
     except Exception:
         raised = True
     assert raised is True
+
+
+def test_loopback_resource_url_is_accepted_for_local_sellers(direct_vm, direct_deploy, direct_alice, direct_bob):
+    contract = direct_deploy(CONTRACT)
+    direct_vm.sender = direct_alice
+    case_id = contract.open_case(
+        to_hex(direct_bob), "http://127.0.0.1:8402/dataset/latency-feed", PROMISE, 1000, "USDC", RECEIPT
+    )
+    assert contract.get_case(case_id)["resource_url"].startswith("http://127.0.0.1")
 
 
 def test_stats_track_disputes_and_refunds(direct_vm, direct_deploy, direct_alice, direct_bob):

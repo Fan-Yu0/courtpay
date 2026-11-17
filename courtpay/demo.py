@@ -19,6 +19,9 @@ from .seller import Catalog, serve
 from .x402 import LocalLedgerSettler, X402Error
 
 DEFAULT_PORT = 8402
+DEFAULT_DELIVERY_URL = (
+    "https://raw.githubusercontent.com/Fan-Yu0/courtpay/master/demo/deliveries/latency-feed.json"
+)
 
 
 def _short(value: str, keep: int = 10) -> str:
@@ -84,7 +87,7 @@ def run_demo(
         check = check_delivery(CATALOG["latency-feed"], payload)
         _log("buyer", "preflight: %d rows, missing %s" % (check["rows"], ", ".join(check["missing_fields"]) or "nothing"))
 
-        public_url = deliverable_url
+        public_url = deliverable_url or DEFAULT_DELIVERY_URL
         if not public_url:
             path = os.path.join(STATE_DIR, "delivery.json")
             with open(path, "w", encoding="utf-8") as handle:
