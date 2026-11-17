@@ -1,0 +1,8 @@
+{
+  "dataset": "base-sepolia-rpc-latency",
+  "probed_at": "2026-11-15T03:40:00Z",
+  "rows": [
+    { "region": "eu-fra", "endpoint": "https://rpc-eu.example.net", "p50_ms": 41, "p99_ms": 96, "probe_checksum": "0x3f9a..." },
+    { "region": "us-east", "endpoint": "https://rpc-us.example.net", "p50_ms": 88, "p99_ms": 210, "probe_checksum": "0x81c2..." }
+  ]
+}

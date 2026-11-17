@@ -1,0 +1,4 @@
+eth-account>=0.13
+genlayer-py>=0.16
+pytest>=8
+genvm-linter>=0.11
